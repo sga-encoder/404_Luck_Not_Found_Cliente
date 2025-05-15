@@ -41,6 +41,10 @@ class MyAppDev(App):
         ''')
         return CasinoScreenManager()
 
-if __name__ == '__main__':
+def main():
+    """Función principal que inicia la aplicación"""
     MyApp().run()
-    # MyAppDev().run()
+    # Para desarrollo: MyAppDev().run()
+
+if __name__ == '__main__':
+    main()

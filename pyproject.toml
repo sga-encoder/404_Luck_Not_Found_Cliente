@@ -1,0 +1,29 @@
+[tool.poetry]
+name = "casino-client"
+version = "0.1.0"
+description = "Cliente de Casino 404 Luck Not Found"
+authors = ["Sebastian Garzon Arias <tu@email.com>"]
+readme = "README.md"
+packages = [{include = "src"}]
+
+[tool.poetry.dependencies]
+python = ">=3.9,<4.0"
+kivy = "^2.3.1"
+websockets = "^10.3"
+asyncio = "^3.4.3"
+kivy-garden-frostedglass = "^0.5.0"
+kivy_deps-sdl2 = {version = "^0.8.0", platform = "win32"}
+kivy_deps-glew = {version = "^0.3.1", platform = "win32"}
+kivy_deps-angle = {version = "^0.4.0", platform = "win32"}
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^7.4.0"
+pyinstaller = {version = "^6.0.0", python = ">=3.9,<3.13"}
+
+
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.poetry.scripts]
+casino-client = "CasinoScreenManager:main"
