@@ -1,0 +1,48 @@
+<NombreLabel@Label>:
+    canvas.before:
+        Color:
+            rgba: 1, 1, 1, 1
+        Line:
+            points: [self.x, self.y, self.right, self.y]
+            width: 2
+
+<UserInicio@AnchorLayout>:
+    anchor_x: 'left'
+    anchor_y: 'center'
+
+    BoxLayout:
+        orientation: 'horizontal'
+        size_hint_y: 0.9
+        spacing: dp(15)
+
+        # Imagen de usuario
+        UserImage:
+            source: 'src/assets/imagen/user.jpg'
+            size_hint: None, None
+            size: dp(60), dp(60)
+            fit_mode: 'cover'
+            pos_hint: {'center_y': 0.5}
+
+        # Info de usuario
+        BoxLayout:
+            orientation: 'vertical'
+            spacing: dp(0)
+            
+            NombreLabel:
+                text: 'Sebastian Garzon Arias'
+                font_name: "src/assets/fonts/Turret_Road/TurretRoad-Medium.ttf"
+                font_size: '22sp'
+                color: 1, 1, 1, 1
+                halign: 'left'
+                valign: 'top'
+                pos_hint: {'x': 0}
+                text_size: self.width, None
+                
+            Label:
+                text: '#SG324'
+                font_name: "src/assets/fonts/Electrolize-Regular.ttf"
+                font_size: '16sp'
+                color: 1, 1, 1, 1
+                halign: 'left'
+                valign: 'bottom'
+                text_size: self.width, None

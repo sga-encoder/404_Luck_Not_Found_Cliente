@@ -1,0 +1,30 @@
+<JuegoSeccionItem>
+    background: root.background_id
+    size_hint: (0.3, 1)
+    blur_size: 5
+    saturation: 1.1
+    luminosity: 1.1
+    overlay_color: "#80808000"
+    noise_opacity: 0.0
+    border_radius:  dp(20), dp(20), dp(20), dp(20)
+    outline_color: "#ffffff"
+    outline_width: 2
+    
+    Image:
+        id: item_image
+        pos_hint: {'center_x': 0.5, 'center_y': 0.6}
+        source: root.imagen
+        size_hint: 0.6, 0.8
+        fit_mode: 'scale-down'
+
+    Label: 
+        id: item_label
+        text: root.titulo
+        size_hint: 0.6, 0.2
+        pos_hint: {'center_x': 0.5, 'center_y': 0.3}
+        color: (1, 1, 1, 1)
+        font_size: dp(28)
+        halign: 'center'
+        valign: 'middle'
+        text_size: self.size
+        font_name: "src/assets/fonts/Turret_Road/TurretRoad-Medium.ttf"

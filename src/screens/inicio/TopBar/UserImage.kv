@@ -1,0 +1,15 @@
+<UserImage@Image>:
+    canvas.before:
+        StencilPush
+        RoundedRectangle:
+            size: self.size
+            pos: self.pos
+            radius: [dp(60), dp(60), dp(60), dp(60)] 
+        StencilUse
+    canvas.after:
+        StencilUnUse
+        RoundedRectangle:
+            size: self.size
+            pos: self.pos
+            radius: [dp(60), dp(60), dp(60), dp(60)]
+        StencilPop

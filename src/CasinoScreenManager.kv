@@ -1,0 +1,12 @@
+#:kivy 1.0.9
+
+<CasinoScreenManager>:
+    canvas.before:
+        Rectangle:
+            pos: self.pos
+            size: self.size
+            source: 'src/assets/imagen/fondo.jpg'
+    PortadaScreen:
+        name: 'portada'
+    InicioScreen:
+        name: 'inicio'

@@ -1,0 +1,49 @@
+<ImagenContainer@BoxLayout>:
+    canvas.before:
+        Color:
+            rgba: 1,1,1,1
+        Line:
+            points: [self.x, self.y, self.x, self.top]
+            width: 2
+            
+
+<Saldo>:
+    BoxLayout:
+        orientation: 'horizontal'
+        canvas.before:
+            Color:
+                rgba: 1, 1, 1, 1
+            Line:
+                rounded_rectangle: [self.pos[0], self.pos[1], self.size[0], self.size[1], 15]
+                width: 2
+
+        BoxLayout:
+            orientation: 'horizontal'
+            padding: dp(10), 0
+
+            Label:
+                text: 'Saldo:'
+                font_size: '18sp'
+                color: 1, 1, 1, 1
+                font_name: "src/assets/fonts/Turret_Road/TurretRoad-Medium.ttf"
+                size_hint_x: None
+                width: self.texture_size[0]
+                halign: 'right'
+                valign: 'middle'
+
+            Label:
+                text: '$10K'
+                font_size: '22sp'
+                font_name: "src/assets/fonts/Electrolize-Regular.ttf"
+                color: 1, 1, 1, 1
+                padding_x: dp(10)
+                halign: 'left'
+                valign: 'middle'
+
+        ImagenContainer:
+            size_hint: .3, 1
+            padding: dp(10)
+            Image:
+                source: 'src/assets/imagen/icons_money.png'
+                size_hint: 1, 1
+                pos_hint: {'center_y': 0.5, 'center_x': 0.5}

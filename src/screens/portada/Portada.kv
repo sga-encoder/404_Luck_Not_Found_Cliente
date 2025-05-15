@@ -1,0 +1,38 @@
+#:kivy 1.0.9
+
+<PortadaScreen>:
+    FloatLayout:
+        Image:
+            source: 'src/assets/imagen/logo.png'
+            size_hint: None, None
+            size: self.texture_size
+            pos_hint: {'center_x': 0.5, 'center_y': 0.65}
+
+        Button:
+            text: 'Iniciar Juego'
+            size_hint: None, None
+            size: 341, 72
+            pos_hint: {'center_x': 0.5, 'center_y': 0.3}
+            background_color: 0.0, 0.0, 0.0, 0
+            color: 1, 1, 1, 1 
+            on_press: app.root.current = 'inicio'
+            font_name: "src/assets/fonts/Turret_Road/TurretRoad-Medium.ttf"
+            font_size: '38sp'
+            canvas.before:
+                Color:
+                    rgba: 1, 1, 1, 1
+                Line:
+                    rounded_rectangle: [self.pos[0], self.pos[1], self.size[0], self.size[1], 15]
+                    width: 2
+
+        Button:
+            text: '[u]salir[/u]'
+            markup: True
+            size_hint: None, None
+            size: 341, 72
+            pos_hint: {'center_x': 0.5, 'center_y': 0.225}
+            background_color: 0.0, 0.0, 0.0, 0
+            color: 1, 1, 1, 1
+            on_press: app.stop()
+            font_name: "src/assets/fonts/Electrolize-Regular.ttf"
+            font_size: '30sp'

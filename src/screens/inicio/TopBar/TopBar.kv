@@ -1,0 +1,55 @@
+<TopBar>:
+    anchor_x: 'left'
+    anchor_y: 'top'
+    size_hint: 1, None
+    height: self.ids.top_box.height
+    pos_hint: {'top': 1}
+
+    BoxLayout:
+        id: top_box
+        orientation: 'horizontal'
+        size_hint: 1, None
+        height: dp(100)
+        padding: dp(10)
+
+        # contenedor userInicio
+        BoxLayout:
+            size_hint: .25, 1
+            UserInicio:
+                size_hint: 1, 1
+        #espacion transparente entre userInicio y Saldo
+        BoxLayout:
+            size_hint: .50, 1
+        
+        # contenedor Saldo
+        BoxLayout:
+            size_hint: .2, 1
+            orientation: 'vertical'
+            
+            BoxLayout:
+                size_hint_y: 0.15
+            
+            Saldo:
+                size_hint: 0.8, 0.7
+            
+            BoxLayout:
+                size_hint_y: 0.15
+
+        # contenedor de icono de settings
+        BoxLayout:
+            size_hint:.05, 1
+            orientation: 'vertical'
+
+            # Espacio flexible arriba para centrar
+            BoxLayout:
+                size_hint_y: 0.1
+
+            Image:
+                source: 'src/assets/imagen/icons_settings.png'
+                size_hint: .8, .9
+                fit_mode: 'scale-down'
+                pos_hint: {'center_y': 0.5}
+
+            # Espacio flexible abajo para centrar
+            BoxLayout:
+                size_hint_y: 0.1

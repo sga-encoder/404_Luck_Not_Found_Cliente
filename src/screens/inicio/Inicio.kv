@@ -1,0 +1,19 @@
+#:kivy 1.0.9
+
+<InicioScreen>:
+
+    FloatLayout:
+        id: float_layout
+        
+        JuegoSeccion:
+            id: seccion_juegos
+            size_hint: 1, 1
+            pos_hint: {'center_x': 0.5, 'center_y': 0.5}
+
+        TopBar:
+            id: top_bar
+            size_hint: 1, .1
+            pos_hint: { 'right': 1, 'top': 1 }
+
+        BottomBar:
+            size_hint: 1,.1

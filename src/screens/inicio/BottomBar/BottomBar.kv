@@ -1,0 +1,77 @@
+<BottomBar>:
+    size_hint: 1, .1
+    pos_hint: { 'x': 0, 'y': 0 }
+    canvas.before:
+        Color:
+            rgba: 0, 0, 0, 0
+        Rectangle:
+            size: self.size
+            pos: self.pos
+            
+    BoxLayout:
+        orientation: 'horizontal'
+        size_hint: 1, 1
+        padding: [20, 10]
+        spacing: 20
+        
+        BoxLayout:
+            orientation: 'horizontal'
+            size_hint: .25, .8
+            pos_hint: {'center_y': 0.5}
+            spacing: 5
+            canvas.before:
+                Color:
+                    rgba: 1, 1, 1, 1
+                Line:
+                    rounded_rectangle: [self.pos[0], self.pos[1], self.size[0], self.size[1], 15]
+                    width: 2
+
+            Button:
+                id: btn_sala_privada
+                text: 'crear sala privada'
+                background_color: 0, 0, 0, 0
+                color: 1, 1, 1, 1
+                font_name: "src/assets/fonts/Electrolize-Regular.ttf"
+                font_size: '18sp'
+                size_hint: .8, 1
+                on_release: print("Crear sala privada")
+            
+            BoxLayout:
+                size_hint: .2, 1
+                BoxLayout:
+                    size_hint: 1, .025
+                Image:
+                    source: 'src/assets/imagen/icons_plus.png'
+                    size_hint: 1, .95
+                    fit_mode: 'contain'
+                BoxLayout:
+                    size_hint: 1, .025
+        
+        Widget:
+            size_hint: .5, 1
+        
+        BoxLayout:
+            orientation: 'horizontal'
+            size_hint: .25, .8
+            pos_hint: {'center_y': 0.5}
+            spacing: 5
+            canvas.before:
+                Color:
+                    rgba: 1, 1, 1, 1
+                Line:
+                    rounded_rectangle: [self.pos[0], self.pos[1], self.size[0], self.size[1], 15]
+                    width: 2
+            Button:
+                id: btn_ver_comunidad
+                text: 'ver comunidad'
+                background_color: 0, 0, 0, 0
+                color: 1, 1, 1, 1
+                font_name: "src/assets/fonts/Electrolize-Regular.ttf"
+                font_size: '18sp'
+                size_hint: .8, 1
+                on_release: print("Ver comunidad")
+            
+            Image:
+                source: 'src/assets/imagen/icons_comunidad.png'
+                size_hint: .2, 1
+                fit_mode: 'contain'
