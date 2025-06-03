@@ -1,4 +1,3 @@
-# filepath: c:\Users\SGA\Programacion\tecnicas_de_programacion\404_Luck_Not_Found\cliente\screens\juegos\blackjack\cartas.py
 import random
 
 # Diccionario de palos con sus símbolos y abreviaciones para nombres de variables, no afectaran a la puntuacion
