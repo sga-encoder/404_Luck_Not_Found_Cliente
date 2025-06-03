@@ -3,17 +3,17 @@ import time
 import pyfiglet
 
 
-from .screens.forms.login_with_print_form import login_form_with_print_form
-from .screens.home import home
-from .screens.juegos.poker import poker
-from .screens.juegos.blackjack.blackjack_inicio import blackjack_inicio
-from .screens.juegos.blackjack.blackjack_juego import blackjack_juego
-from .screens.juegos.knucklebones.knucklebones import knucklebones
-# from .screens.forms.login import login_form
-# from .screens.forms.login_avanzado import advanced_login_form
-from .utils.events import add_key_listener
-from .utils.helpers import create_card, font_tester, font_tester_recomded
-from .utils.printers import print_button, print_text
+from .forms.login_with_print_form import login_form_with_print_form
+from .home import home
+from .juegos.poker import poker
+from .juegos.blackjack.blackjack_inicio import blackjack_inicio
+from .juegos.blackjack.blackjack_juego import blackjack_juego
+from .juegos.knucklebones.knucklebones import knucklebones
+# from .forms.login import login_form
+# from .forms.login_avanzado import advanced_login_form
+from ..utils.events import add_key_listener
+from ..utils.helpers import create_card, font_tester, font_tester_recomded
+from ..utils.printers import print_button, print_text
 
 def inicio(screen):
     screen.mouse = True

@@ -1,15 +1,16 @@
 import copy
-from screens.juegos.knucklebones.dados import get_dado
-from utils.events import add_key_listener, get_remaining_cooldown
-from utils.printers import print_card, print_text
+from .dados import get_dado
+from ....utils.events import add_key_listener, get_remaining_cooldown
+from ....utils.printers import print_card, print_text
 from asciimatics.screen import Screen
 import pyfiglet
 from asciimatics.event import MouseEvent
 
-
-
+# Variable global para almacenar el último evento del mouse
+last_mouse_event = None
 
 def knucklebones(screen):
+    global last_mouse_event
     screen.mouse = True
     screen.clear()
     font = pyfiglet.FigletFont.getFonts()
@@ -50,15 +51,14 @@ def knucklebones(screen):
                 'y-center': -15,
                 'color': Screen.COLOUR_YELLOW
             })
+        screen.clear()
         
         screen.refresh()
         event = screen.get_event()
         # Guardar el último MouseEvent válido
-        if not hasattr(knucklebones, 'last_mouse_event'):
-            knucklebones.last_mouse_event = None
         if isinstance(event, MouseEvent):
-            knucklebones.last_mouse_event = event
-        event_mouse = knucklebones.last_mouse_event
+            last_mouse_event = event
+        event_mouse = last_mouse_event
         contador += 1
         
         print_card_data_1 = copy.deepcopy(print_card_data)

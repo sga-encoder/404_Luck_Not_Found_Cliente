@@ -21,7 +21,8 @@ def create_card(data: dict) -> str:
     grid = data['grid'] if 'grid' in data else False
     grid_ascii_x = data['grid_ascii_x'] if 'grid_ascii_x' in data else ascii_x
     grid_ascii_y = data['grid_ascii_y'] if 'grid_ascii_y' in data else ascii_y
-    grid_intersections = data['grid_intersection'] if 'grid_intersection' in data else ['┼', '┬', '┴', '├', '┤']
+    grid_intersections = data['grid_intersections'] if 'grid_intersections' in data else ['┼', '┬', '┴', '├', '┤']
+    grid_corners = data['grid_corners'] if 'grid_corners' in data else corner  # Bordes específicos para grid
     grid_divider_x = data['grid_divider_x'] if 'grid_divider_x' in data else 2
     grid_divider_y = data['grid_divider_y'] if 'grid_divider_y' in data else 2
     grid_cell_width = (width) // grid_divider_x
@@ -41,9 +42,7 @@ def create_card(data: dict) -> str:
             text_line.append(linea_actual)
             linea_actual = palabra
     if linea_actual:
-        text_line.append(linea_actual)
-
-    # Centramos verticalmente el bloque de texto
+        text_line.append(linea_actual)    # Centramos verticalmente el bloque de texto
     lineas_texto = len(text_line)
     lineas_vacias_arriba = (height - 2 - lineas_texto) // 2
     lineas_vacias_abajo = height - 2 - lineas_texto - lineas_vacias_arriba
@@ -66,7 +65,7 @@ def create_card(data: dict) -> str:
                 text_grid += filler_text('', ascii_x, grid_cell_width, 'center')
             else:
                 text_grid += filler_text('', ascii_x, grid_cell_width, 'center') + grid_intersections[1]
-        card_text += corner[0] + text_grid + corner[1] + '\n'
+        card_text += grid_corners[0] + text_grid + grid_corners[1] + '\n'
         for i in range(height):
             text_grid = ''
             # Solo accedemos si hay más divisiones
@@ -92,7 +91,7 @@ def create_card(data: dict) -> str:
                 text_grid += filler_text('', ascii_x, grid_cell_width, 'center')
             else:
                 text_grid += filler_text('', ascii_x, grid_cell_width, 'center') + grid_intersections[2]
-        card_text += corner[2] + text_grid + corner[3]
+        card_text += grid_corners[2] + text_grid + grid_corners[3]
     else:
         card_text += corner[0] + filler_text('', ascii_x, width - (len(corner[0]) + len(corner[1])) + (2 * len(ascii_y)), 'center') + corner[1] + '\n'
         for _ in range(lineas_vacias_arriba):

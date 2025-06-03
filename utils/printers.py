@@ -1,7 +1,7 @@
 from asciimatics.screen import Screen
 from pyfiglet import Figlet
 
-from utils.helpers import create_card
+from .helpers import create_card
 
 
 def print_text(screen, data: dict, asccii_art: bool = False) -> dict:
@@ -120,8 +120,7 @@ def print_text(screen, data: dict, asccii_art: bool = False) -> dict:
     else:
         text = data['text'].split('\n')
         height = len(text)
-    
-    # Calcular el ancho máximo de todas las líneas
+      # Calcular el ancho máximo de todas las líneas
     width = max(len(line) for line in text) if text else 0
     if 'y_position' in data:
         y_position = data['y_position']
@@ -144,6 +143,8 @@ def print_text(screen, data: dict, asccii_art: bool = False) -> dict:
                 x_position = (screen.width - width) // 2 + data['x-center']
             elif 'x-right' in data:
                 x_position = screen.width - width - data['x-right']
+            else:
+                x_position = 0  # Valor por defecto si no se especifica posición
 
         if(bg is not None):
             screen.print_at(line, x_position, y_position + idx, colour=color, bg=bg)
@@ -159,7 +160,7 @@ def print_text(screen, data: dict, asccii_art: bool = False) -> dict:
     }
     
 def print_button(screen, data: dict, event=None, click=None) -> dict:
-    from utils.events import add_mouse_listener  # Importación local para evitar ciclo
+    from .events import add_mouse_listener  # Importación local para evitar ciclo
 
     """
     Dibuja un botón en la pantalla y detecta si ha sido presionado mediante un clic del mouse.
@@ -214,8 +215,7 @@ def print_button(screen, data: dict, event=None, click=None) -> dict:
     }
     
 def print_card(screen, data: dict, event=None, click=None) -> dict:
-    from utils.events import add_mouse_listener  # Importación local para evitar ciclo
-
+    from .events import add_mouse_listener  # Importación local para evitar ciclo
     """
     Dibuja una carta visual personalizada en la pantalla usando Asciimatics y permite detectar si ha sido presionada mediante un clic del mouse.
 
@@ -249,8 +249,7 @@ def print_card(screen, data: dict, event=None, click=None) -> dict:
         - El evento debe ser un objeto MouseEvent y debe tener 'event.buttons != 0' para que se considere un clic.
         - El área de detección se calcula usando el ancho y la altura de la carta renderizada.
         - Si el usuario hace clic dentro de esa área, se ejecuta la función click y su resultado se devuelve en 'result'.
-    """
-    # establecer valores por defecto o usar los proporcionados en el diccionario data
+    """    # establecer valores por defecto o usar los proporcionados en el diccionario data
     width = data.get('width', 21)
     height = data.get('height', 13)
     text = data.get('text', '')
@@ -261,10 +260,13 @@ def print_card(screen, data: dict, event=None, click=None) -> dict:
     bg = data.get('bg', Screen.COLOUR_DEFAULT)
     justify = data.get('justify', 'left')
     grid = data.get('grid', False)
+      # Inicializar buttons_return para evitar UnboundLocalError
+    buttons_return = {}
     max_width = data.get('max-width', 100)
     grid_ascii_x = data.get('grid_ascii_x', ascii_x)
     grid_ascii_y = data.get('grid_ascii_y', ascii_y)
-    grid_intersections = data.get('grid_intersection', ['┼', '┬', '┴', '├', '┤'])
+    grid_intersections = data.get('grid_intersections', ['┼', '┬', '┴', '├', '┤'])
+    grid_corners = data.get('grid_corners', corner)  # Bordes específicos para grid
     grid_divider_x = data.get('grid_divider_x', 2)
     grid_divider_y = data.get('grid_divider_y', 2)
     grid_click = data.get('grid_click', None)
@@ -333,8 +335,7 @@ def print_card(screen, data: dict, event=None, click=None) -> dict:
                         'position': content[str(i)].get('position', 'top_left_corner'),
                         'padding': padding,
                         'padding-top': padding_top,
-                        'padding-left': padding_left,
-                        'padding-bottom': padding_bottom,
+                        'padding-left': padding_left,                        'padding-bottom': padding_bottom,
                         'padding-right': padding_right,
                         }
                     if 'button' in content[str(i)] and content[str(i)]['button']:
@@ -342,14 +343,13 @@ def print_card(screen, data: dict, event=None, click=None) -> dict:
                     if 'event' in content[str(i)]:
                         data_aux['event'] = content[str(i)]['event']
                     if 'click' in content[str(i)]:
-                        data_aux = content[str(i)]['click']
+                        data_aux['click'] = content[str(i)]['click']
                     grid_cell.append(data_aux)
                 else:
                     grid_cell.append([])
-            
+        
         posicion = 0
-        
-        
+
         for i in range(len(data_position['position_cell_divider_x'])):
             for j in range(len(data_position['position_cell_divider_y'])):
                 text_cell = ''
@@ -373,31 +373,72 @@ def print_card(screen, data: dict, event=None, click=None) -> dict:
                     posicion_cell_x = [
                         x - data_position['grid_cell_width']+1,
                         x - len(text_cell.split('\n'))+1,
-                        x - len(text_cell.split('\n')[0])+1,
-                    ]
+                        x - len(text_cell.split('\n')[0])+1,                    ]
                     posicion_cell_y = [
                         y - data_position['grid_cell_height']+1,
                         y - len(text_cell.split('\n'))+1,
                         y - len(text_cell.split('\n')[0])+1
-                    ]
-
+                    ]                # Definir posicion_cell para ambos casos
                 posicion_cell = {
                     'top_left_corner': (posicion_cell_x[0], posicion_cell_y[0]),
-                    'top_right_corner': (posicion_cell_x[1], posicion_cell_y[0]),
+                    'top_right_corner': (posicion_cell_x[1], posicion_cell_y[0]),                
                     'bottom_right_corner': (posicion_cell_x[2], posicion_cell_y[1]),
                     'bottom_left_corner': (posicion_cell_x[0], posicion_cell_y[2])
                 }
-                
                 if posicion < grid_num_cells and grid_cell[posicion] != []:
-                    if 'button' in grid_cell[posicion]:
-                        print_button(screen, {
-                            'text': text_cell,
+                    # Determinar el tipo de elemento a renderizar
+                    element_type = grid_cell[posicion].get('type', 'text')  # 'text', 'button', 'input', 'card'
+                    
+                    if element_type == 'button' or 'button' in grid_cell[posicion]:
+                        # Renderizar botón
+                        button_data = print_button(screen, {
+                            'text': grid_cell[posicion]['text'],  # Usar el texto real del botón
                             'color': grid_cell[posicion]['color'],
                             'bg': grid_cell[posicion]['bg'],
                             'x_position': posicion_cell[grid_cell[posicion]['position']][0],
                             'y_position': posicion_cell[grid_cell[posicion]['position']][1],
-                        }, grid_cell[posicion]['event'] if 'event' in grid_cell[posicion] else None, grid_cell[posicion]['click'] if 'click' in grid_cell[posicion] else None)
+                        }, event, grid_cell[posicion].get('click', None))
+                        
+                        # Guardar información completa del botón incluyendo si fue clickeado
+                        buttons_return[posicion] = {
+                            'clicked': button_data['result'] is not None,
+                            'result': button_data['result'],
+                            'text': grid_cell[posicion]['text'],  # Usar el texto real del botón
+                            'width': button_data['width'],
+                            'height': button_data['height'],
+                            'x_position': button_data['x_position'],
+                            'y_position': button_data['y_position']
+                        }
+                        
+                    elif element_type == 'input':
+                        # Renderizar input
+                        input_config = grid_cell[posicion].copy()
+                        input_config.update({
+                            'x_position': posicion_cell[grid_cell[posicion]['position']][0],
+                            'y_position': posicion_cell[grid_cell[posicion]['position']][1],
+                        })
+                        input_state = grid_cell[posicion].get('input_state', {
+                            'value': '',
+                            'cursor_pos': 0,
+                            'is_focused': False,
+                            'changed': False,
+                            'clicked': False
+                        })
+                        input_result = print_input(screen, input_config, event, input_state)
+                        buttons_return[posicion] = input_result
+                        
+                    elif element_type == 'card':
+                        # Renderizar carta anidada
+                        card_config = grid_cell[posicion].copy()
+                        card_config.update({
+                            'x_position': posicion_cell[grid_cell[posicion]['position']][0],
+                            'y_position': posicion_cell[grid_cell[posicion]['position']][1],
+                        })
+                        card_result = print_card(screen, card_config, event, grid_cell[posicion].get('click', None))
+                        buttons_return[posicion] = card_result
+                        
                     else:
+                        # Renderizar texto (comportamiento por defecto)
                         print_text(screen, {
                             'text': text_cell,
                             'color': grid_cell[posicion]['color'],
@@ -423,9 +464,8 @@ def print_card(screen, data: dict, event=None, click=None) -> dict:
                 'x_position': x,
                 'y_position': y,
                 'width': width,
-                'height': height
-            }
-            if str(i) in data['click']:
+                'height': height            }
+            if 'click' in data and str(i) in data['click']:
                 click_column = data['click'][str(i)]
                 aux = add_mouse_listener(
                     screen,
@@ -453,10 +493,9 @@ def print_card(screen, data: dict, event=None, click=None) -> dict:
                 'x_position': x,
                 'y_position': y,
                 'width': width,
-                'height': height
-            }
+                'height': height            }
             
-            if str(i) in data['click']:
+            if 'click' in data and str(i) in data['click']:
                 click_row = data['click'][str(i)]
                 aux = add_mouse_listener(
                     screen, 
@@ -471,6 +510,7 @@ def print_card(screen, data: dict, event=None, click=None) -> dict:
         result = add_mouse_listener(screen, card, event, click, element_id=f"card_{card['x_position']}_{card['y_position']}") if click else None
     return {
         "result": result,
+        "result_buttons": buttons_return,
         "width": width,
         "height": height,
         "x_position": card['x_position'],
@@ -551,9 +591,8 @@ def print_input(screen, data: dict, event=None, input_state=None) -> dict:
             
             # Verificar cambios
             if user_input_state['changed']:
-                print(f"Usuario cambió a: {user_input_state['value']}")
-    """
-    from utils.events import add_key_listener, add_mouse_listener
+                print(f"Usuario cambió a: {user_input_state['value']}")    """
+    from .events import add_key_listener, add_mouse_listener
     from asciimatics.event import KeyboardEvent
     
     # Validaciones obligatorias
@@ -661,8 +700,7 @@ def print_input(screen, data: dict, event=None, input_state=None) -> dict:
                     input_state['cursor_pos'] += 1
                     input_state['changed'] = True
             return True
-        
-        # Agregar key listeners para eventos de teclado
+          # Agregar key listeners para eventos de teclado
         add_key_listener(-203, event, handle_left_arrow)      # Flecha izquierda
         add_key_listener(-205, event, handle_right_arrow)     # Flecha derecha
         add_key_listener(-300, event, handle_backspace)       # Backspace
@@ -714,3 +752,461 @@ def print_input(screen, data: dict, event=None, input_state=None) -> dict:
         'clicked': input_state['clicked'],  # Agregar información del clic
         'changed': input_state['changed']   # Agregar información de cambios
     }
+
+def print_form(screen, form_config: dict, event=None) -> dict:
+    """
+    Función avanzada para crear formularios dinámicos con inputs, botones y navegación automática.
+    
+    Permite crear formularios complejos usando configuración declarativa, con soporte para:
+    - Inputs de texto y contraseña
+    - Botones con funciones personalizadas
+    - Contenedores opcionales (print_card)
+    - Navegación automática con TAB
+    - Validación de campos
+    - Manejo de eventos de teclado y mouse
+    
+    Args:
+        screen: Objeto Screen de asciimatics
+        form_config (dict): Configuración del formulario con las siguientes claves:
+            
+            **Configuración General:**
+            - 'title' (str, opcional): Título del formulario
+            - 'title_config' (dict, opcional): Configuración del título (usa print_text)
+            - 'position' (dict, opcional): Posición del formulario {'x': int, 'y': int, 'x-center': int, 'y-center': int}
+            
+            **Contenedor (opcional):**
+            - 'container' (dict, opcional): Configuración del contenedor usando print_card
+              Si se especifica, todos los elementos se posicionarán relativos al contenedor
+            
+            **Campos de entrada:**
+            - 'inputs' (dict): Diccionario con configuración de inputs
+              Clave: ID del input
+              Valor: Configuración del input (usa print_input)
+              
+            **Botones:**
+            - 'buttons' (dict, opcional): Configuración de botones
+              Puede ser:
+              1. Diccionario simple: cada clave es ID del botón, valor es configuración
+              2. Configuración de print_card con grid para botones organizados
+              
+            **Navegación:**
+            - 'navigation_order' (list, opcional): Orden de navegación con TAB
+              Si no se especifica, usa el orden: inputs (alfabético) + botones (alfabético)
+            - 'initial_focus' (str, opcional): ID del campo con focus inicial
+            
+            **Validación:**
+            - 'validation' (dict, opcional): Reglas de validación por campo
+              Formato: {'campo_id': {'required': bool, 'min_length': int, 'max_length': int, 'custom': function}}
+            
+            **Eventos personalizados:**
+            - 'key_handlers' (dict, opcional): Manejadores personalizados de teclas
+              Formato: {tecla_codigo: función}
+        
+        event: Evento actual del sistema
+    
+    Returns:
+        dict: Resultado del formulario con:
+            - 'form_state' (dict): Estado actual del formulario
+                - 'current_field' (str): Campo actualmente enfocado
+                - 'form_data' (dict): Datos de todos los inputs
+                - 'result' (dict o None): Resultado si el formulario se completó
+                - 'show_error' (bool): Si hay error visible
+                - 'error_message' (str): Mensaje de error actual
+            - 'position' (dict): Información de posición y tamaño
+                - 'x' (int): Posición X del formulario
+                - 'y' (int): Posición Y del formulario
+                - 'width' (int): Ancho total del formulario
+                - 'height' (int): Alto total del formulario
+            - 'inputs_data' (dict): Estados detallados de todos los inputs
+    
+    Ejemplo de uso básico:
+        form_config = {
+            'title': 'LOGIN',
+            'title_config': {
+                'font': 'slant',
+                'color': Screen.COLOUR_CYAN,
+                'x-center': 0,
+                'y': 2
+            },
+            'container': {
+                'width': 50,
+                'height': 18,
+                'x-center': 0,
+                'y-center': 0
+            },
+            'inputs': {
+                'usuario': {
+                    'label': 'Usuario:',
+                    'width': 44,
+                    'height': 4,
+                    'x-center': 0,
+                    'y-center': -4,
+                    'placeholder': 'Ingresa tu usuario'
+                },
+                'password': {
+                    'label': 'Contraseña:',
+                    'width': 44,
+                    'height': 4,
+                    'x-center': 0,
+                    'y-center': 0,
+                    'placeholder': 'Ingresa tu contraseña',
+                    'is_password': True
+                }
+            },
+            'buttons': {
+                'grid': True,
+                'width': 40,
+                'height': 3,
+                'x-center': 0,
+                'y-center': 5,
+                'grid_divider_x': 2,
+                'grid_divider_y': 1,
+                'content': {
+                    '0': {
+                        'text': 'INICIAR SESIÓN',
+                        'button': True,
+                        'action': 'submit'
+                    },
+                    '1': {
+                        'text': 'CANCELAR',
+                        'button': True,
+                        'action': 'cancel'
+                    }
+                }
+            },
+            'validation': {
+                'usuario': {'required': True, 'min_length': 3},
+                'password': {'required': True, 'min_length': 4}
+            }
+        }
+        
+        result = print_form(screen, form_config, event)
+        
+        if result['form_state']['result']:
+            action = result['form_state']['result']['action']
+            if action == 'submit':
+                user_data = result['form_state']['form_data']
+                print(f"Usuario: {user_data['usuario']}, Password: {user_data['password']}")    """
+    from .events import add_key_listener
+    from asciimatics.event import MouseEvent
+    
+    # Inicializar estado del formulario si no existe
+    if not hasattr(print_form, '_form_states'):
+        print_form._form_states = {}
+    
+    form_id = id(form_config)  # Usar ID del objeto como identificador único
+    
+    if form_id not in print_form._form_states:
+        # Inicializar estado del formulario
+        inputs_config = form_config.get('inputs', {})
+        navigation_order = form_config.get('navigation_order', [])
+        
+        # Si no se especifica orden de navegación, usar orden alfabético
+        if not navigation_order:
+            navigation_order = sorted(inputs_config.keys())
+            if 'buttons' in form_config:
+                buttons_config = form_config['buttons']
+                if isinstance(buttons_config, dict) and 'content' in buttons_config:
+                    # Botones en grid
+                    button_ids = [f"btn_{key}" for key in sorted(buttons_config['content'].keys())]
+                    navigation_order.extend(button_ids)
+                else:
+                    # Botones simples
+                    navigation_order.extend([f"btn_{key}" for key in sorted(buttons_config.keys())])
+        
+        initial_focus = form_config.get('initial_focus', navigation_order[0] if navigation_order else '')
+        
+        # Crear estados de inputs
+        input_states = {}
+        for input_id in inputs_config.keys():
+            input_states[input_id] = {
+                'value': '',
+                'cursor_pos': 0,
+                'is_focused': (input_id == initial_focus),
+                'changed': False,
+                'clicked': False
+            }
+        
+        print_form._form_states[form_id] = {
+            'current_field': initial_focus,
+            'navigation_order': navigation_order,
+            'input_states': input_states,
+            'show_error': False,
+            'error_message': '',
+            'result': None,
+            'form_data': {}
+        }
+    
+    form_state = print_form._form_states[form_id]
+    
+    # Variables para almacenar información de posición
+    form_position = {'x': 0, 'y': 0, 'width': 0, 'height': 0}
+    inputs_data = {}
+    last_mouse_event = None
+    
+    # Guardar último evento de mouse
+    if isinstance(event, MouseEvent):
+        last_mouse_event = event
+    
+    # 1. Renderizar título si existe
+    if 'title' in form_config:
+        title_config = form_config.get('title_config', {})
+        title_config['text'] = form_config['title']
+        print_text(screen, title_config, asccii_art=title_config.get('font') is not None)
+    
+    # 2. Renderizar contenedor si existe
+    container_result = None
+    if 'container' in form_config:
+        container_result = print_card(screen, form_config['container'])
+        form_position.update({
+            'x': container_result['x_position'],
+            'y': container_result['y_position'],
+            'width': container_result['width'],
+            'height': container_result['height']
+        })
+    
+    # 3. Renderizar inputs
+    for input_id, input_config in form_config.get('inputs', {}).items():
+        # Configurar colores basados en el estado de focus
+        if form_state['current_field'] == input_id:
+            input_config['color_focused'] = input_config.get('color_focused', Screen.COLOUR_YELLOW)
+            input_config['color_normal'] = input_config.get('color_normal', Screen.COLOUR_WHITE)
+        else:
+            input_config['color_focused'] = input_config.get('color_normal', Screen.COLOUR_WHITE)
+            input_config['color_normal'] = input_config.get('color_normal', Screen.COLOUR_WHITE)
+        
+        # Asegurar que el input tenga ID
+        input_config['id'] = input_id
+        
+        # Renderizar input
+        input_result = print_input(screen, input_config, event, form_state['input_states'][input_id])
+        
+        # Actualizar estado del input
+        form_state['input_states'][input_id] = input_result['input_state']
+        inputs_data[input_id] = input_result
+        
+        # Actualizar datos del formulario
+        form_state['form_data'][input_id] = input_result['input_state']['value']
+        
+        # Detectar clicks para cambiar focus
+        if input_result['input_state']['clicked']:
+            form_state['current_field'] = input_id
+            form_state['show_error'] = False
+            # Actualizar focus de todos los inputs
+            for iid in form_state['input_states']:
+                form_state['input_states'][iid]['is_focused'] = (iid == input_id)
+    
+    # 4. Renderizar botones
+    button_results = {}
+    if 'buttons' in form_config:
+        buttons_config = form_config['buttons']
+        
+        if isinstance(buttons_config, dict) and 'content' in buttons_config:
+            # Botones en grid usando print_card
+            # Actualizar colores y eventos para cada botón
+            for btn_key, btn_config in buttons_config['content'].items():
+                btn_id = f"btn_{btn_key}"
+                
+                # Configurar colores basados en focus
+                if form_state['current_field'] == btn_id:
+                    btn_config['color'] = btn_config.get('color_focused', Screen.COLOUR_GREEN)
+                    btn_config['bg'] = btn_config.get('bg_focused', Screen.COLOUR_GREEN)
+                else:
+                    btn_config['color'] = btn_config.get('color_normal', Screen.COLOUR_WHITE)
+                    btn_config['bg'] = btn_config.get('bg_normal', Screen.COLOUR_BLACK)
+                
+                # Agregar evento
+                btn_config['event'] = last_mouse_event
+                
+                # Crear función de click si no existe
+                if 'action' in btn_config and 'click' not in btn_config:
+                    action = btn_config['action']
+                    if action == 'submit':
+                        btn_config['click'] = lambda: _handle_submit(form_state, form_config)
+                    elif action == 'cancel':
+                        btn_config['click'] = lambda: _handle_cancel(form_state)
+                    else:
+                        # Acción personalizada
+                        btn_config['click'] = lambda a=action: _handle_custom_action(form_state, a)
+            
+            # Renderizar botones usando print_card
+            buttons_result = print_card(screen, buttons_config, last_mouse_event)
+            button_results.update(buttons_result.get('result_buttons', {}))
+            
+        else:
+            # Botones simples
+            for btn_id, btn_config in buttons_config.items():
+                full_btn_id = f"btn_{btn_id}"
+                
+                # Configurar colores basados en focus
+                if form_state['current_field'] == full_btn_id:
+                    btn_config['color'] = btn_config.get('color_focused', Screen.COLOUR_GREEN)
+                    btn_config['bg'] = btn_config.get('bg_focused', Screen.COLOUR_GREEN)
+                else:
+                    btn_config['color'] = btn_config.get('color_normal', Screen.COLOUR_WHITE)
+                    btn_config['bg'] = btn_config.get('bg_normal', Screen.COLOUR_BLACK)
+                
+                # Crear función de click si no existe
+                if 'action' in btn_config and 'click' not in btn_config:
+                    action = btn_config['action']
+                    if action == 'submit':
+                        btn_config['click'] = lambda: _handle_submit(form_state, form_config)
+                    elif action == 'cancel':
+                        btn_config['click'] = lambda: _handle_cancel(form_state)
+                    else:
+                        btn_config['click'] = lambda a=action: _handle_custom_action(form_state, a)
+                
+                # Renderizar botón
+                btn_result = print_button(screen, btn_config, event, btn_config.get('click'))
+                button_results[btn_id] = btn_result['result']
+    
+    # 5. Mostrar errores si existen
+    if form_state['show_error']:
+        error_config = {
+            'text': f"❌ {form_state['error_message']}",
+            'x-center': 0,
+            'y-center': 8,
+            'color': Screen.COLOUR_RED
+        }
+        print_text(screen, error_config)
+    
+    # 6. Verificar si se presionaron botones
+    for btn_key, btn_result in button_results.items():
+        if btn_result:
+            # Un botón fue presionado, su función click ya fue ejecutada
+            pass
+    
+    # 7. Manejo de navegación con TAB
+    def handle_tab():
+        if form_state['navigation_order']:
+            current_index = form_state['navigation_order'].index(form_state['current_field'])
+            next_index = (current_index + 1) % len(form_state['navigation_order'])
+            form_state['current_field'] = form_state['navigation_order'][next_index]
+            form_state['show_error'] = False
+            
+            # Actualizar focus de inputs
+            for input_id in form_state['input_states']:
+                form_state['input_states'][input_id]['is_focused'] = (input_id == form_state['current_field'])
+
+    def handle_enter():
+        form_state['show_error'] = False
+        current = form_state['current_field']
+        
+        if current.startswith('btn_'):
+            # Es un botón, ejecutar su acción
+            if current == 'btn_0' or 'submit' in current:
+                return _handle_submit(form_state, form_config)
+            elif current == 'btn_1' or 'cancel' in current:
+                return _handle_cancel(form_state)
+        else:
+            # Es un input, ir al siguiente campo
+            if form_state['navigation_order']:
+                current_index = form_state['navigation_order'].index(current)
+                next_index = (current_index + 1) % len(form_state['navigation_order'])
+                form_state['current_field'] = form_state['navigation_order'][next_index]
+                
+                # Actualizar focus
+                for input_id in form_state['input_states']:
+                    form_state['input_states'][input_id]['is_focused'] = (input_id == form_state['current_field'])
+        return False
+
+    def handle_escape():
+        return _handle_cancel(form_state)
+
+    # 8. Aplicar manejadores de eventos
+    result = add_key_listener(-301, event, handle_tab)  # TAB
+    if result:
+        pass  # Continue normal flow
+        
+    result = add_key_listener([10, 13], event, handle_enter)  # ENTER
+    if result:
+        pass  # Continue normal flow
+        
+    result = add_key_listener(-1, event, handle_escape)  # ESCAPE
+    if result:
+        pass  # Continue normal flow
+    
+    # 9. Manejadores personalizados de teclas
+    if 'key_handlers' in form_config:
+        for key_code, handler in form_config['key_handlers'].items():
+            result = add_key_listener(key_code, event, handler)
+            if result:
+                pass
+    
+    # Calcular posición y tamaño del formulario si no se definió por contenedor
+    if not container_result:
+        # Calcular basado en los elementos renderizados
+        min_x = min_y = float('inf')
+        max_x = max_y = float('-inf')
+        
+        for input_data in inputs_data.values():
+            min_x = min(min_x, input_data['x_position'])
+            min_y = min(min_y, input_data['y_position'])
+            max_x = max(max_x, input_data['x_position'] + input_data['width'])
+            max_y = max(max_y, input_data['y_position'] + input_data['height'])
+        
+        if min_x != float('inf'):
+            form_position.update({
+                'x': min_x,
+                'y': min_y,
+                'width': max_x - min_x,
+                'height': max_y - min_y
+            })
+    
+    return {
+        'form_state': form_state,
+        'position': form_position,
+        'inputs_data': inputs_data
+    }
+
+def _handle_submit(form_state, form_config):
+    """Maneja el envío del formulario con validación"""
+    validation_config = form_config.get('validation', {})
+    
+    # Validar campos
+    for field_id, rules in validation_config.items():
+        if field_id in form_state['form_data']:
+            value = form_state['form_data'][field_id].strip()
+            
+            if rules.get('required', False) and not value:
+                form_state['error_message'] = f'El campo {field_id} es requerido'
+                form_state['show_error'] = True
+                return False
+            
+            min_length = rules.get('min_length')
+            if min_length and len(value) < min_length:
+                form_state['error_message'] = f'El campo {field_id} debe tener al menos {min_length} caracteres'
+                form_state['show_error'] = True
+                return False
+            
+            max_length = rules.get('max_length')
+            if max_length and len(value) > max_length:
+                form_state['error_message'] = f'El campo {field_id} no puede tener más de {max_length} caracteres'
+                form_state['show_error'] = True
+                return False
+            
+            custom_validator = rules.get('custom')
+            if custom_validator and not custom_validator(value):
+                form_state['error_message'] = f'El campo {field_id} no es válido'
+                form_state['show_error'] = True
+                return False
+    
+    # Si llegamos aquí, la validación pasó
+    form_state['result'] = {
+        'action': 'submit',
+        'data': form_state['form_data'].copy()
+    }
+    return True
+
+def _handle_cancel(form_state):
+    """Maneja la cancelación del formulario"""
+    form_state['result'] = {'action': 'cancel'}
+    return True
+
+def _handle_custom_action(form_state, action):
+    """Maneja acciones personalizadas"""
+    form_state['result'] = {
+        'action': action,
+        'data': form_state['form_data'].copy()
+    }
+    return True

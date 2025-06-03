@@ -1,5 +1,5 @@
-from utils.events import add_key_listener
-from utils.printers import print_text
+from ...utils.events import add_key_listener
+from ...utils.printers import print_text
 
 
 def poker(screen):

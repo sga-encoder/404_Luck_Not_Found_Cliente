@@ -2,7 +2,7 @@ from asciimatics.event import MouseEvent, KeyboardEvent
 from asciimatics.screen import Screen
 import time
 
-from utils.printers import print_text
+from .printers import print_text
 
 # Diccionario global para almacenar los últimos tiempos de click por elemento
 _last_click_times = {}

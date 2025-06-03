@@ -1,7 +1,7 @@
 from asciimatics.screen import Screen
 
-from utils.events import add_key_listener
-from utils.printers import print_card
+from ..utils.events import add_key_listener
+from ..utils.printers import print_card
 
 def home(screen):
     screen.mouse = True
