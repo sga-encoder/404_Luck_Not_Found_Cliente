@@ -2,16 +2,20 @@ from ....utils.events import add_key_listener
 from ....utils.printers import print_text, print_button, print_card
 from asciimatics.screen import Screen
 import pyfiglet
-from .cartas import cartas
+import time
+from .cartas import sacar_carta
 
 # Importar del módulo compartido para evitar importación circular
 from . import blackjack_shared
 
+# Importar las cartas desde cartas.py
+from .cartas import cartas
 
 def blackjack_juego(screen):
     screen.clear()
     screen.mouse = True
     
+    # ================= INTEGRACIÓN CON BACKEND =================
     # Obtener las variables del módulo compartido
     blackjack_instance, jugador_actual = blackjack_shared.get_game_state()
     
@@ -31,30 +35,23 @@ def blackjack_juego(screen):
             if salir == 'salir':
                 return 'salir'
     
-    # Estado del juego
-    estado_juego = {
-        "mensaje": "🎮 Presiona INICIAR para comenzar la partida",
-        "error": None,
-        "juego_iniciado": False
-    }
+    # Inicializar partida automáticamente
+    try:
+        print("🎮 Iniciando partida automáticamente...")
+        resultado = blackjack_instance.iniciar_partida_blackjack(jugador_actual.get_id())
+        if not resultado.get('success'):
+            print(f"❌ Error iniciando partida: {resultado.get('error')}")
+    except Exception as e:
+        print(f"💥 Error iniciando partida: {e}")
     
+    # ================= TU FRONTEND EXACTO =================
     mesa = {
-        'text': f'🃏 Mesa BlackJack - Sala: {blackjack_instance.sala_activa_id[:8] if blackjack_instance.sala_activa_id else "N/A"}...',
+        'text': 'Mesa BlackJack',
         'x-center': 0,
         'y-center': -20,
         'font': 'elite',
         'justify': 'center',
         'color': Screen.COLOUR_CYAN,
-    }
-
-    boton_iniciar = {
-        'text': '┌─────────────┐\n'
-                '│   INICIAR   │\n'
-                '└─────────────┘',
-        'x-center': -70,
-        'y-center': 14,
-        'color': Screen.COLOUR_BLACK,
-        'bg': Screen.COLOUR_BLUE,
     }
 
     boton_pedirCarta = {
@@ -76,293 +73,272 @@ def blackjack_juego(screen):
         'color': Screen.COLOUR_BLACK,
         'bg': Screen.COLOUR_RED,
     }
-    
-    boton_nueva_partida = {
-        'text': '┌─────────────┐\n'
-                '│NUEVA PARTIDA│\n'
-                '└─────────────┘',
-        'x-center': -70,
-        'y-center': 26,
+
+    boton_jugadorActivo = {
+        'text': '[JUGADOR ACTIVO]',
+        'x-center': 0,
+        'y-center': 0,
         'color': Screen.COLOUR_BLACK,
-        'bg': Screen.COLOUR_YELLOW,
+        'bg': Screen.COLOUR_BLUE,
     }
     
-    def iniciar_partida():
-        """Inicia el juego DIRECTAMENTE en BlackJack"""
+    boton_jugadorEspera = {
+        'text': '[JUGADOR ESPERANDO]',
+        'x-center': 0,
+        'y-center': 0,
+        'color': Screen.COLOUR_BLACK,
+        'bg': Screen.COLOUR_MAGENTA,
+    }
+
+    # ================= FUNCIONES DE INTEGRACIÓN =================
+    def obtener_datos_del_backend():
+        """Obtiene los datos del juego desde el backend BlackJack"""
         try:
-            print("🎮 Iniciando partida...")
+            if not blackjack_instance or not jugador_actual:
+                return [], []
             
-            # DIRECTO al método de BlackJack
-            resultado = blackjack_instance.iniciar_partida_blackjack(jugador_actual.get_id())
-            
-            print(f"📋 Resultado de iniciar partida: {resultado}")
-            
-            if resultado.get('success'):
-                estado_juego["juego_iniciado"] = True
-                estado_juego["mensaje"] = "🎉 ¡Juego iniciado! Cartas repartidas"
-                estado_juego["error"] = None
-                print("✅ Partida iniciada exitosamente")
-            else:
-                estado_juego["error"] = f"❌ {resultado.get('error', 'Error al iniciar juego')}"
-                print(f"❌ Error iniciando partida: {estado_juego['error']}")
-            
-            return True
-        except Exception as e:
-            estado_juego["error"] = f"💥 Error: {str(e)}"
-            print(f"💥 Excepción en iniciar_partida: {e}")
-            import traceback
-            traceback.print_exc()
-            return True
-    
-    def pedir_carta():
-        """Pide una carta DIRECTAMENTE en BlackJack"""
-        try:
-            print("🃏 Pidiendo carta...")
-            
-            # DIRECTO al método de BlackJack
-            resultado = blackjack_instance.pedir_carta_jugador(jugador_actual.get_id())
-            
-            print(f"📋 Resultado de pedir carta: {resultado}")
-            
-            if resultado.get('success'):
-                estado_juego["mensaje"] = f"🎯 {resultado.get('mensaje', 'Carta repartida')}"
-                estado_juego["error"] = None
-            else:
-                estado_juego["error"] = f"❌ {resultado.get('error', 'Error pidiendo carta')}"
-            
-            return True
-        except Exception as e:
-            estado_juego["error"] = f"💥 Error: {str(e)}"
-            print(f"💥 Excepción en pedir_carta: {e}")
-            return True
-    
-    def plantarse():
-        """Se planta DIRECTAMENTE en BlackJack"""
-        try:
-            print("🛑 Plantándose...")
-            
-            # DIRECTO al método de BlackJack
-            resultado = blackjack_instance.plantarse_jugador(jugador_actual.get_id())
-            
-            print(f"📋 Resultado de plantarse: {resultado}")
-            
-            if resultado.get('success'):
-                estado_juego["mensaje"] = f"🏁 {resultado.get('mensaje', 'Te plantaste')}"
-                estado_juego["error"] = None
-            else:
-                estado_juego["error"] = f"❌ {resultado.get('error', 'Error al plantarse')}"
-            
-            return True
-        except Exception as e:
-            estado_juego["error"] = f"💥 Error: {str(e)}"
-            print(f"💥 Excepción en plantarse: {e}")
-            return True
-    
-    def nueva_partida():
-        """Reinicia el juego para una nueva partida"""
-        try:
-            # Limpiar estado del juego
-            blackjack_instance.manos_jugadores = {}
-            blackjack_instance.mano_crupier = []
-            blackjack_instance.estado_juego = "esperando"
-            
-            estado_juego["juego_iniciado"] = False
-            estado_juego["mensaje"] = "🎮 Presiona INICIAR para comenzar nueva partida"
-            estado_juego["error"] = None
-            
-            return True
-        except Exception as e:
-            estado_juego["error"] = f"💥 Error reiniciando: {str(e)}"
-            return True
-    
-    def convertir_carta_a_visual(carta_nombre: str) -> str:
-        """Convierte carta del backend al formato visual existente"""
-        # Mapear cartas del diccionario _cartas a cartas visuales
-        carta_map = {
-            '2': '2_de_corazones', '3': '3_de_diamantes', '4': '4_de_treboles',
-            '5': '5_de_picas', '6': '6_de_corazones', '7': '7_de_diamantes',
-            '8': '8_de_treboles', '9': '9_de_picas', '10': '10_de_corazones',
-            'J': 'J_de_diamantes', 'Q': 'Q_de_treboles', 'K': 'K_de_picas',
-            'A': 'A_de_picas'
-        }
-        return carta_map.get(carta_nombre, 'A_de_picas')
-    
-    while True:
-        screen.refresh()
-        print_text(screen, mesa, True)
-        
-        # Mostrar mensaje de estado
-        mensaje_estado = {
-            'text': estado_juego["mensaje"],
-            'x-center': 0,
-            'y-center': -15,
-            'color': Screen.COLOUR_WHITE,
-        }
-        print_text(screen, mensaje_estado)
-        
-        # Mostrar error si existe
-        if estado_juego["error"]:
-            error_text = {
-                'text': estado_juego["error"],
-                'x-center': 0,
-                'y-center': -12,
-                'color': Screen.COLOUR_RED,
-            }
-            print_text(screen, error_text)
-        
-        # Mostrar información de debug
-        debug_text = {
-            'text': f'🔍 Debug: Juego iniciado: {estado_juego["juego_iniciado"]} | Instancia: {blackjack_instance is not None}',
-            'x-center': 0,
-            'y-center': 18,
-            'color': Screen.COLOUR_BLACK,
-        }
-        print_text(screen, debug_text)
-        
-        # Obtener estado DIRECTAMENTE del BlackJack
-        if blackjack_instance and jugador_actual:
+            # Obtener estado completo desde Firestore
             estado_actual = blackjack_instance.obtener_estado_completo(jugador_actual.get_id())
             
-            # Mostrar cartas del jugador
             if 'manos_jugadores' in estado_actual:
                 jugador_id = jugador_actual.get_id()
                 
+                # Obtener cartas del jugador
+                jugadores_cartas = []
                 if jugador_id in estado_actual['manos_jugadores']:
                     mi_mano = estado_actual['manos_jugadores'][jugador_id]
                     cartas_jugador = mi_mano.get('cartas', [])
-                    puntos_jugador = mi_mano.get('puntos', 0)
                     
-                    # Mostrar cartas del jugador
-                    for i, carta_nombre in enumerate(cartas_jugador):
-                        carta_visual = convertir_carta_a_visual(carta_nombre)
-                        
-                        if carta_visual in cartas:
-                            carta = {
-                                'text': cartas[carta_visual],
-                                'x-center': -30 + (i * 18),
-                                'y-center': 5,
-                                'color': Screen.COLOUR_BLACK,
-                                'bg': Screen.COLOUR_WHITE,
-                                'height': 4,
-                                'width': 15
-                            }
-                            print_card(screen, carta)
-                    
-                    # Mostrar puntos del jugador
-                    if cartas_jugador:  # Solo mostrar si hay cartas
-                        puntos_text = {
-                            'text': f"🎯 Tus puntos: {puntos_jugador}",
-                            'x-center': 0,
-                            'y-center': 15,
-                            'color': Screen.COLOUR_YELLOW,
-                        }
-                        print_text(screen, puntos_text)
+                    # Convertir a formato que espera el frontend (4 jugadores)
+                    for i in range(4):
+                        if i == 0:  # El jugador actual es el jugador 1
+                            jugadores_cartas.append(cartas_jugador)
+                        else:  # Otros jugadores ficticios
+                            jugadores_cartas.append([sacar_carta(), sacar_carta()])
+                else:
+                    # Si no hay datos, usar cartas por defecto
+                    jugadores_cartas = [[sacar_carta(), sacar_carta()] for _ in range(4)]
                 
-                # Mostrar cartas del crupier
-                mano_crupier = estado_actual.get('mano_crupier', [])
-                plantado = estado_actual.get('manos_jugadores', {}).get(jugador_id, {}).get('plantado', False)
+                # Obtener cartas del crupier
+                crupier_cartas = estado_actual.get('mano_crupier', [sacar_carta(), sacar_carta()])
                 
-                for i, carta_nombre in enumerate(mano_crupier):
-                    # Primera carta siempre visible, segunda solo si está plantado
-                    if i == 0 or plantado:
-                        carta_visual = convertir_carta_a_visual(carta_nombre)
-                        
-                        if carta_visual in cartas:
-                            carta = {
-                                'text': cartas[carta_visual],
-                                'x-center': -10 + (i * 18),
-                                'y-center': -8,
-                                'color': Screen.COLOUR_BLACK,
-                                'bg': Screen.COLOUR_WHITE,
-                                'height': 4,
-                                'width': 15
-                            }
-                            print_card(screen, carta)
-                    elif i == 1:
-                        # Carta oculta del crupier
-                        carta_oculta = {
-                            'text': '┌─────────────┐\n'
-                                   '│ ?           │\n'
-                                   '│             │\n'
-                                   '│             │\n'
-                                   '│      #      │\n'
-                                   '│             │\n'
-                                   '│             │\n'
-                                   '│           ? │\n'
-                                   '└─────────────┘',
-                            'x-center': -10 + (i * 18),
-                            'y-center': -8,
-                            'color': Screen.COLOUR_BLACK,
-                            'bg': Screen.COLOUR_WHITE,
-                            'height': 4,
-                            'width': 15
-                        }
-                        print_card(screen, carta_oculta)
+                return jugadores_cartas, crupier_cartas
+            else:
+                # Fallback: datos por defecto
+                return [[sacar_carta(), sacar_carta()] for _ in range(4)], [sacar_carta(), sacar_carta()]
                 
-                # Mostrar puntos del crupier si el juego terminó
-                if plantado and mano_crupier:
-                    puntos_crupier = blackjack_instance.calcular_puntos(mano_crupier)
-                    
-                    puntos_crupier_text = {
-                        'text': f"🤵 Puntos crupier: {puntos_crupier}",
-                        'x-center': 0,
-                        'y-center': -3,
-                        'color': Screen.COLOUR_CYAN,
-                    }
-                    print_text(screen, puntos_crupier_text)
+        except Exception as e:
+            print(f"⚠️ Error obteniendo datos del backend: {e}")
+            # Fallback: datos por defecto
+            return [[sacar_carta(), sacar_carta()] for _ in range(4)], [sacar_carta(), sacar_carta()]
 
-        # Instrucciones
-        instrucciones = {
-            'text': 'Presiona F para salir',
-            'x-center': 50,
-            'y-center': 26,
-            'color': Screen.COLOUR_BLACK,
-        }
-        print_text(screen, instrucciones)
+    def obtener_carta_desde_cartas_py(carta_nombre: str) -> str:
+        """Obtiene la carta ASCII desde cartas.py o genera una básica"""
+        if not carta_nombre:
+            return sacar_carta()
+        
+        # Buscar la carta en el diccionario de cartas
+        carta_ascii = cartas.get(carta_nombre)
+        
+        if carta_ascii:
+            return carta_ascii
+        else:
+            # Fallback: carta básica
+            palos = ['♠', '♣', '♥', '♦']
+            palo = palos[hash(carta_nombre) % len(palos)]
+            
+            return (f'┌─────────────┐\n'
+                   f'│{carta_nombre:<2}           │\n'
+                   f'│             │\n'
+                   f'│             │\n'
+                   f'│      {palo}      │\n'
+                   f'│             │\n'
+                   f'│             │\n'
+                   f'│          {carta_nombre:>2}│\n'
+                   f'└─────────────┘')
+
+    def pedir_carta_backend():
+        """Función que conecta con el backend para pedir carta"""
+        try:
+            print("🃏 Pidiendo carta al backend...")
+            resultado = blackjack_instance.pedir_carta_jugador(jugador_actual.get_id())
+            
+            if resultado.get('success'):
+                print(f"✅ Carta recibida: {resultado.get('nueva_carta')} - Puntos: {resultado.get('puntos')}")
+                return True
+            else:
+                print(f"❌ Error pidiendo carta: {resultado.get('error')}")
+                return False
+        except Exception as e:
+            print(f"💥 Error en pedir_carta_backend: {e}")
+            return False
+
+    def plantarse_backend():
+        """Función que conecta con el backend para plantarse"""
+        try:
+            print("🛑 Plantándose en el backend...")
+            resultado = blackjack_instance.plantarse_jugador(jugador_actual.get_id())
+            
+            if resultado.get('success'):
+                print(f"✅ Plantado exitosamente: {resultado.get('mensaje')}")
+                return True
+            else:
+                print(f"❌ Error al plantarse: {resultado.get('error')}")
+                return False
+        except Exception as e:
+            print(f"💥 Error en plantarse_backend: {e}")
+            return False
+
+    # ================= OBTENER DATOS INICIALES =================
+    # Inicializar 4 jugadores y 1 crupier con datos del backend
+    jugadores, crupier = obtener_datos_del_backend()
+
+    posiciones = [
+        (-65, -5),  # Jugador 1
+        (-47, 15),   # Jugador 2
+        (25, 15),    # Jugador 3
+        (30, -3),   # Jugador 4
+    ]
+    posicion_crupier = (0, -13)
+
+    jugador_actual_indice = 0
+
+    def avanzar_turno():
+        nonlocal jugador_actual_indice
+        if jugador_actual_indice < len(jugadores)-1:
+            jugador_actual_indice += 1
+        
+        # También llamar al backend para plantarse
+        plantarse_backend()
+
+    # ================= BUCLE PRINCIPAL CON INTEGRACIÓN =================
+    while True:
+        # Actualizar datos del backend periódicamente
+        if hasattr(blackjack_juego, '_last_update'):
+            import time
+            if time.time() - blackjack_juego._last_update > 1:  # Actualizar cada segundo
+                jugadores, crupier = obtener_datos_del_backend()
+                blackjack_juego._last_update = time.time()
+        else:
+            blackjack_juego._last_update = time.time()
+        
+        screen.refresh()
+        print_text(screen, mesa, True)
+        
+        # Mostrar todas las cartas del jugador alineadas horizontalmente
+        for idx, mano in enumerate(jugadores):
+            x_base, y_base = posiciones[idx]
+            for j, carta_texto in enumerate(mano):
+                # Usar cartas reales desde cartas.py
+                carta_ascii = obtener_carta_desde_cartas_py(carta_texto)
+                
+                carta = {
+                    'text': '',
+                    'x-center': x_base + (j * 18),
+                    'y-center': y_base,
+                    'color': Screen.COLOUR_BLACK,
+                    'bg': Screen.COLOUR_WHITE,
+                    'height': 15,
+                    'width': 15,
+                    'ascii_x': " ",
+                    'ascii_y': " ",
+                    'grid': True,
+                    'grid_divider_x': 1,
+                    'grid_divider_y': 1,
+                    'content': {
+                        '0': {
+                            'text': carta_ascii,  # Usar carta ASCII real
+                            'color': Screen.COLOUR_BLACK,
+                            'bg': Screen.COLOUR_WHITE,             
+                        }
+                    }
+                }
+                   
+                print_card(screen, carta)
+
+            if idx == jugador_actual_indice:
+                boton_jugadorActivo['x-center'] = x_base
+                boton_jugadorActivo['y-center'] = y_base - 8
+                print_button(screen, boton_jugadorActivo, None)
+            else:
+                boton_jugadorEspera['x-center'] = x_base
+                boton_jugadorEspera['y-center'] = y_base - 8
+                print_button(screen, boton_jugadorEspera, None, False)
+
+        # Mostrar cartas del crupier
+        for i, carta_texto in enumerate(crupier):
+            # Verificar si el jugador se plantó para mostrar todas las cartas del crupier
+            plantado = False
+            try:
+                if blackjack_instance.manos_jugadores.get(jugador_actual.get_id()):
+                    plantado = blackjack_instance.manos_jugadores[jugador_actual.get_id()].get('plantado', False)
+            except:
+                pass
+            
+            # Primera carta siempre visible, segunda solo si se plantó
+            if i == 0 or plantado:
+                carta_ascii = obtener_carta_desde_cartas_py(carta_texto)
+            else:
+                carta_ascii = (
+                    '┌─────────────┐\n'
+                    '│ ?           │\n'
+                    '│             │\n'
+                    '│             │\n'
+                    '│      #      │\n'
+                    '│             │\n'
+                    '│             │\n'
+                    '│           ? │\n'
+                    '└─────────────┘'
+                )
+            
+            carta_oculta = {
+                'text': carta_ascii,
+                'x-center': posicion_crupier[0] + (i * 18),  # Posicionar cartas del crupier
+                'y-center': posicion_crupier[1],
+                'color': Screen.COLOUR_BLACK,
+                'bg': Screen.COLOUR_WHITE,
+                'height': 15,
+                'width': 15
+            }
+            print_card(screen, carta_oculta)
 
         event = screen.get_event()
 
-        # Botón iniciar (solo si no ha iniciado el juego)
-        if not estado_juego["juego_iniciado"]:
-            print_button(
-                screen,
-                boton_iniciar,
-                event,
-                click=iniciar_partida
-            )
+        # Jugadores pueden pedir más cartas - CONECTADO AL BACKEND
+        resultado_pedir = print_button(
+            screen,
+            boton_pedirCarta,
+            event,
+            click=lambda: pedir_carta_backend() and obtener_datos_del_backend()
+        )
+        
+        # Al hacer click en pedir carta, actualizar datos
+        if resultado_pedir.get('result'):
+            time.sleep(0.5)  # Pequeña pausa para que se actualice Firestore
+            jugadores, crupier = obtener_datos_del_backend()
 
-        # Botones de acción (solo si el juego está iniciado y no está plantado)
-        if estado_juego["juego_iniciado"] and blackjack_instance and jugador_actual:
-            plantado = False
-            if blackjack_instance.manos_jugadores.get(jugador_actual.get_id()):
-                plantado = blackjack_instance.manos_jugadores[jugador_actual.get_id()].get('plantado', False)
-            
-            if not plantado:
-                print_button(
-                    screen,
-                    boton_pedirCarta,
-                    event,
-                    click=pedir_carta
-                )
+        # Plantarse - CONECTADO AL BACKEND
+        resultado_plantarse = print_button(
+            screen,
+            boton_plantarse,
+            event,
+            click=avanzar_turno
+        )
+        
+        # Al plantarse, actualizar datos
+        if resultado_plantarse.get('result'):
+            time.sleep(0.5)  # Pequeña pausa para que se actualice Firestore
+            jugadores, crupier = obtener_datos_del_backend()
 
-                print_button(
-                    screen,
-                    boton_plantarse,
-                    event,
-                    click=plantarse
-                )
-            else:
-                # Botón para nueva partida cuando el juego terminó
-                print_button(
-                    screen,
-                    boton_nueva_partida,
-                    event,
-                    click=nueva_partida
-                )
-
-        # Tecla para salir
+        # Salir del juego
         salir = add_key_listener(ord('f'), event, lambda: 'salir')
         if salir == 'salir':
-            # Limpiar estado al salir
-            blackjack_shared.clear_game_state()
+            print("🚪 Saliendo del BlackJack...")
+            try:
+                blackjack_shared.clear_game_state()
+                time.sleep(0.2)
+            except Exception as e:
+                print(f"⚠️ Error durante limpieza al salir: {e}")
+            finally:
+                print("👋 Salida del BlackJack completada")
             return 'salir'

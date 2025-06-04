@@ -66,26 +66,26 @@ def blackjack_inicio(screen):
                 _apuesta=10
             )
             
-            print(f"🎮 BlackJack creado")
+            print(f"BlackJack creado")
             
             # Guardar en el módulo compartido
             blackjack_shared.set_game_state(blackjack_instance, jugador_actual)
             
             # Crear sala activa DIRECTAMENTE con Firestore (THREAD-SAFE)
-            print("🏗️ Creando sala activa en Firestore...")
+            print(" Creando sala activa en Firestore...")
             sala_id = blackjack_instance.crear_sala_activa_con_jugador(jugador_actual)
             
             if sala_id:
-                print(f"✅ Sala creada exitosamente en Firestore: {sala_id}")
+                print(f" Sala creada exitosamente en Firestore: {sala_id}")
                 # Importar y llamar directamente a blackjack_juego
                 from .blackjack_juego import blackjack_juego
                 return blackjack_juego(screen)
             else:
-                estado["error"] = "❌ Error creando sala activa en Firestore"
+                estado["error"] = " Error creando sala activa en Firestore"
                 return None
                 
         except Exception as e:
-            estado["error"] = f"❌ Error: {str(e)}"
+            estado["error"] = f" Error: {str(e)}"
             print(f"Error completo: {e}")
             import traceback
             traceback.print_exc()

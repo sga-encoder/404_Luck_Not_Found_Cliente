@@ -9,11 +9,10 @@ from asciimatics.event import MouseEvent
 # Variable global para almacenar el último evento del mouse
 last_mouse_event = None
 
-def knucklebones(screen):
+def knucklebones_juego(screen):
     global last_mouse_event
     screen.mouse = True
     screen.clear()
-    font = pyfiglet.FigletFont.getFonts()
     contador = 0
     # Inicializa color para cada celda
     color1 = [Screen.COLOUR_DEFAULT] * 9
@@ -51,7 +50,7 @@ def knucklebones(screen):
                 'y-center': -15,
                 'color': Screen.COLOUR_YELLOW
             })
-        screen.clear()
+        # screen.clear()
         
         screen.refresh()
         event = screen.get_event()
