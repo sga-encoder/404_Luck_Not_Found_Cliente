@@ -56,7 +56,7 @@ def main(screen):
         if card == 'poker':
             poker(screen)
         elif card == 'blackjack':
-            blackjack(screen)
+            blackjack_inicio(screen)
         elif card == 'knucklebones':
             knucklebones(screen)
 

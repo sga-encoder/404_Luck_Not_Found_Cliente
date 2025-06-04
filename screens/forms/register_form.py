@@ -2,6 +2,7 @@
 Formulario de registro de usuario usando print_form
 """
 # Importaciones estándar
+import json
 import os
 import re
 import sys
@@ -24,7 +25,7 @@ def validate_name(name):
     """Valida que el nombre tenga entre 3 y 30 caracteres"""
     return name and len(name.strip()) >= 3 and len(name.strip()) <= 30
 
-def register_form_with_print_form(screen):
+def register_form(screen):
     """
     Formulario de registro de usuario usando print_form.
     """
@@ -42,6 +43,7 @@ def register_form_with_print_form(screen):
     session_manager = UserSessionManager()
     
     async def handle_register_submit(form_state, form_config):
+        from servidor.src.model.usuario.Usuario import Usuario
         """Maneja el proceso de registro de usuario"""
         nombre = form_state['form_data'].get('nombre', '').strip()
         apellido = form_state['form_data'].get('apellido', '').strip()
@@ -50,51 +52,54 @@ def register_form_with_print_form(screen):
         confirm_password = form_state['form_data'].get('confirm_password', '')
         
         # Validaciones locales adicionales
-        if not validate_name(nombre):
-            form_state['error_message'] = 'El nombre debe tener entre 3 y 30 caracteres'
-            form_state['show_error'] = True
-            return False
-        if not validate_name(apellido):
-            form_state['error_message'] = 'El apellido debe tener entre 3 y 30 caracteres'
-            form_state['show_error'] = True
-            return False
+        # if not validate_name(nombre):
+        #     form_state['error_message'] = 'El nombre debe tener entre 3 y 30 caracteres'
+        #     form_state['show_error'] = True
+        #     return False
+        # if not validate_name(apellido):
+        #     form_state['error_message'] = 'El apellido debe tener entre 3 y 30 caracteres'
+        #     form_state['show_error'] = True
+        #     return False
         
-        if not validate_email(email):
-            form_state['error_message'] = 'Formato de email inválido'
-            form_state['show_error'] = True
-            return False
+        # if not validate_email(email):
+        #     form_state['error_message'] = 'Formato de email inválido'
+        #     form_state['show_error'] = True
+        #     return False
         
-        if len(password) < 8:
-            form_state['error_message'] = 'La contraseña debe tener al menos 8 caracteres'
-            form_state['show_error'] = True
-            return False
-        
+        # if len(password) < 8:
+        #     form_state['error_message'] = 'La contraseña debe tener al menos 8 caracteres'
+        #     form_state['show_error'] = True
+        #     return False
         if password != confirm_password:
             form_state['error_message'] = 'Las contraseñas no coinciden'
             form_state['show_error'] = True
             return False
-          # Mostrar mensaje de carga
+        
+        # Extraer solo datos seguros para mostrar
+        safe_form_data = {
+            'form_data': form_state.get('form_data', {}),
+            'current_field': form_state.get('current_field', ''),
+            'error_message': form_state.get('error_message', ''),
+            'show_error': form_state.get('show_error', False)
+        }
+        
+        print_text(screen, {
+            'text': json.dumps(safe_form_data, indent=2, ensure_ascii=False),
+            'x': 2,
+            'y': 2,
+            'color': Screen.COLOUR_WHITE
+        })
+
+        # print_text(screen, {
+        #     'text': form_config,
+        #     'x-right': 0,
+        #     'y': 0,
+        #     'color': Screen.COLOUR_GREEN
+        # })        # Mostrar mensaje de carga
         auth_state['message'] = 'Registrando usuario...'
         auth_state['message_color'] = Screen.COLOUR_YELLOW
+        
         try:
-            # Importar Usuario de forma más robusta usando la nueva estructura
-            root_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '../../../..'))
-            servidor_path = os.path.join(root_path, 'servidor/src')
-            
-            if servidor_path not in sys.path:
-                sys.path.insert(0, servidor_path)
-                
-            # Intenta importar el módulo Usuario
-            try:
-                from servidor.src.model.usuario.Usuario import Usuario
-            except ImportError as e:
-                # Si falla, intenta una importación alternativa
-                auth_state['message'] = f'Error al importar Usuario: {str(e)}'
-                auth_state['message_color'] = Screen.COLOUR_RED
-                form_state['error_message'] = f'Error de importación: {str(e)}'
-                form_state['show_error'] = True
-                return False
-            
             # Crear usuario usando el método del servidor
             usuario = await Usuario.crear_usuario(nombre, apellido, email, password)
             
@@ -118,19 +123,13 @@ def register_form_with_print_form(screen):
                 form_state['error_message'] = 'Error al guardar la sesión del usuario'
                 form_state['show_error'] = True
                 return False
-                
-        except ValueError as e:
-            auth_state['message'] = str(e)
-            auth_state['message_color'] = Screen.COLOUR_RED
-            form_state['error_message'] = str(e)
-            form_state['show_error'] = True
-            return False
         except Exception as e:
-            auth_state['message'] = f'Error en el registro: {str(e)}'
-            auth_state['message_color'] = Screen.COLOUR_RED
-            form_state['error_message'] = f'Error en el registro: {str(e)}'
+            form_state['error_message'] = f'Error al registrar usuario: {str(e)}'
             form_state['show_error'] = True
+            auth_state['message'] = f'Error: {str(e)}'
+            auth_state['message_color'] = Screen.COLOUR_RED
             return False
+                
     
     # Configuración del formulario usando print_form
     form_config = {
@@ -309,14 +308,3 @@ def register_form_with_print_form(screen):
         # Manejar tecla ESC para salir
         if event and hasattr(event, 'key_code') and event.key_code == 27:
             return {'success': False, 'action': 'exit'}
-
-if __name__ == "__main__":
-    # Ejemplo de uso
-    def main(screen):
-        result = register_form_with_print_form(screen)
-        screen.clear()
-        screen.print_at(f"Resultado: {result}", 0, 0, Screen.COLOUR_WHITE)
-        screen.refresh()
-        screen.wait_for_input(5)
-    
-    Screen.wrapper(main)

@@ -9,7 +9,7 @@ class UserSessionManager:
     Gestiona la sesión del usuario guardando y cargando datos desde un archivo JSON local.
     """
     
-    def __init__(self, session_file_path: str = "user_session.json"):
+    def __init__(self, session_file_path: str = "activo/jugadorActivo.json"):
         """
         Inicializa el gestor de sesión de usuario.
         
