@@ -80,14 +80,26 @@ def blackjack_juego(screen):
             x_base, y_base = posiciones[idx]
             for j, carta_texto in enumerate(mano):
                 carta = {
-                    'text': carta_texto,
+                    'text': '',
                     'x-center': x_base + (j * 18),
                     'y-center': y_base,
                     'color': Screen.COLOUR_BLACK,
                     'bg': Screen.COLOUR_WHITE,
-                    'height': 4,
-                    'width': 15
-                }   
+                    'height': 15,
+                    'width': 15,
+                    'ascii_x':" ",
+                    'ascii_y':" ",
+                    'grid': True,
+                    'grid_divider_x': 1,
+                    'grid_divider_y': 1,
+                    'content': {
+                        '0':{
+                        'text': carta_texto,
+                        'color': Screen.COLOUR_BLACK,
+                        'bg': Screen.COLOUR_WHITE,             
+                    }}
+                }
+                   
                 print_card(screen, carta)
 
             if idx == jugador_actual:
