@@ -4,6 +4,8 @@ Módulo para manejar la persistencia local del usuario en el cliente
 import json
 import os
 
+from servidor.src.model.usuario import UsuarioServicio
+
 class UserSessionManager:
     """
     Gestiona la sesión del usuario guardando y cargando datos desde un archivo JSON local.
@@ -17,7 +19,13 @@ class UserSessionManager:
             session_file_path (str): Ruta del archivo donde se guardará la sesión del usuario.
         """
         self.session_file_path = session_file_path
-    
+        
+    async def load(self, id):
+        usuario_servicio = UsuarioServicio()
+        usuario_data = await usuario_servicio.obtener_usuario(id)
+        self.save_user_session(usuario_data.to_dict())
+        return usuario_data.to_dict()
+
     def save_user_session(self, user_data: dict) -> bool:
         """
         Guarda los datos del usuario en el archivo JSON.
@@ -36,7 +44,7 @@ class UserSessionManager:
             print(f"Error al guardar la sesión del usuario: {e}")
             return False
     
-    def load_user_session(self) -> dict | None:
+    async def load_user_session(self) -> dict | None:
         """
         Carga los datos del usuario desde el archivo JSON.
         
@@ -46,7 +54,10 @@ class UserSessionManager:
         try:
             if os.path.exists(self.session_file_path):
                 with open(self.session_file_path, 'r', encoding='utf-8') as file:
-                    return json.load(file)
+                    json_data = json.load(file)
+                    print(f"Datos de sesión cargados: {json_data}")
+                    data = await self.load(json_data.get('id'))
+                    return data
             return None
         except Exception as e:
             print(f"Error al cargar la sesión del usuario: {e}")

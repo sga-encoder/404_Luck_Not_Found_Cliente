@@ -6,6 +6,7 @@ from ..utils.printers import print_button, print_text
 
 def inicio(screen):
     screen.mouse = True
+    screen.clear()
     contador = [0]
     text = {
         'text': '404-LUCK-NOT FOUND',

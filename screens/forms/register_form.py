@@ -83,12 +83,12 @@ def register_form(screen):
             'show_error': form_state.get('show_error', False)
         }
         
-        print_text(screen, {
-            'text': json.dumps(safe_form_data, indent=2, ensure_ascii=False),
-            'x': 2,
-            'y': 2,
-            'color': Screen.COLOUR_WHITE
-        })
+        # print_text(screen, {
+        #     'text': json.dumps(safe_form_data, indent=2, ensure_ascii=False),
+        #     'x': 2,
+        #     'y': 2,
+        #     'color': Screen.COLOUR_WHITE
+        # })
 
         # print_text(screen, {
         #     'text': form_config,
