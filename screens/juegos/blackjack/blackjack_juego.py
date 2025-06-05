@@ -1,13 +1,14 @@
-from ....utils.events import add_key_listener
-from ....utils.printers import print_text, print_button, print_card
+from cliente.utils.events import add_key_listener
+from cliente.utils.printers import print_text,print_button,print_card
 from asciimatics.screen import Screen
 import pyfiglet
-from .cartas import sacar_carta
+from cliente.screens.juegos.blackjack.cartas import sacar_carta
+
 
 
 def blackjack_juego(screen):
     screen.clear()
-    screen.mouse = True
+    screen.mouse=True
     mesa = {
         'text': 'Mesa BlackJack',
         'x-center': 0,
@@ -17,7 +18,8 @@ def blackjack_juego(screen):
         'color': Screen.COLOUR_CYAN,
     }
 
-    boton_pedirCarta = {
+
+    boton_pedirCarta ={
         'text': '┌─────────────┐\n'
                 '│ PEDIR CARTA │\n'
                 '└─────────────┘',
@@ -27,7 +29,7 @@ def blackjack_juego(screen):
         'bg': Screen.COLOUR_GREEN,
     }
 
-    boton_plantarse = {
+    boton_plantarse ={
         'text': '┌─────────────┐\n'
                 '│  PLANTARSE  │\n'
                 '└─────────────┘',
@@ -37,21 +39,22 @@ def blackjack_juego(screen):
         'bg': Screen.COLOUR_RED,
     }
 
-    boton_jugadorActivo = {
+    boton_jugadorActivo ={
         'text': '[JUGADOR ACTIVO]',
         'x-center': 0,
         'y-center': 0,
         'color': Screen.COLOUR_BLACK,
         'bg': Screen.COLOUR_BLUE,
-    }
+       }
     
-    boton_jugadorEspera = {
+    boton_jugadorEspera ={
         'text': '[JUGADOR ESPERANDO]',
         'x-center': 0,
         'y-center': 0,
         'color': Screen.COLOUR_BLACK,
         'bg': Screen.COLOUR_MAGENTA,
-    }
+       }
+
 
     # Inicializar 4 jugadores y 1 crupier con 2 cartas cada uno
     jugadores = [[sacar_carta(), sacar_carta()] for _ in range(4)]
@@ -65,7 +68,7 @@ def blackjack_juego(screen):
     ]
     posicion_crupier = (0, -13)
 
-    jugador_actual = 0
+    jugador_actual=0
 
     def avanzar_turno():
         nonlocal jugador_actual
@@ -74,45 +77,36 @@ def blackjack_juego(screen):
 
     while True:
         screen.refresh()
-        print_text(screen, mesa, True)
-        # Mostrar todas las cartas del jugador alineadas horizontalmente
+        print_text(screen,mesa, True)
+            # Mostrar todas las cartas del jugador alineadas horizontalmente
         for idx, mano in enumerate(jugadores):
             x_base, y_base = posiciones[idx]
             for j, carta_texto in enumerate(mano):
                 carta = {
-                    'text': '',
+                    'text': carta_texto,
                     'x-center': x_base + (j * 18),
                     'y-center': y_base,
                     'color': Screen.COLOUR_BLACK,
                     'bg': Screen.COLOUR_WHITE,
-                    'height': 15,
+                    'height': 10,
                     'width': 15,
-                    'ascii_x':" ",
-                    'ascii_y':" ",
-                    'grid': True,
-                    'grid_divider_x': 1,
-                    'grid_divider_y': 1,
-                    'content': {
-                        '0':{
-                        'text': carta_texto,
-                        'color': Screen.COLOUR_BLACK,
-                        'bg': Screen.COLOUR_WHITE,             
-                    }}
                 }
                    
+                print_card(screen, carta)   
                 print_card(screen, carta)
 
             if idx == jugador_actual:
                 boton_jugadorActivo['x-center'] = x_base
                 boton_jugadorActivo['y-center'] = y_base - 8
-                print_button(screen, boton_jugadorActivo, None)
+                print_button(screen, boton_jugadorActivo)
             else:
                 boton_jugadorEspera['x-center'] = x_base
                 boton_jugadorEspera['y-center'] = y_base - 8
-                print_button(screen, boton_jugadorEspera, None, False)
+                print_button(screen, boton_jugadorEspera)
+
 
         for i, carta_texto in enumerate(crupier):
-            carta_oculta = {
+            carta_oculta={
                 'text': carta_texto if i == 0 else (
                         '┌─────────────┐'
                 '        │ ?           │'
@@ -130,10 +124,12 @@ def blackjack_juego(screen):
                 'bg': Screen.COLOUR_WHITE,
                 'height': 4,
                 'width': 15
-            }
+        }
             print_card(screen, carta_oculta)
 
+
         event = screen.get_event()
+
 
         # Jugadores pueden pedir más cartas
         print_button(
@@ -143,13 +139,14 @@ def blackjack_juego(screen):
             click=lambda: jugadores[jugador_actual].append(sacar_carta())
         )
 
-        print_button(
+        aanzar_turno = print_button(
             screen,
             boton_plantarse,
             event,
-            click=avanzar_turno
+            lambda: 'HOLA',
         )
-
+        if aanzar_turno['result'] == 'HOLA':
+            avanzar_turno()
         salir = add_key_listener(ord('f'), event, lambda: 'salir')
         if salir == 'salir':
-            return 'salir'
+            return 'salir'      
