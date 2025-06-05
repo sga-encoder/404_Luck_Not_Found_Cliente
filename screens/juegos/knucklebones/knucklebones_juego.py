@@ -9,11 +9,10 @@ from asciimatics.event import MouseEvent
 # Variable global para almacenar el último evento del mouse
 last_mouse_event = None
 
-def knucklebones(screen):
+def knucklebones_juego(screen):
     global last_mouse_event
     screen.mouse = True
     screen.clear()
-    font = pyfiglet.FigletFont.getFonts()
     contador = 0
     # Inicializa color para cada celda
     color1 = [Screen.COLOUR_DEFAULT] * 9
@@ -51,9 +50,8 @@ def knucklebones(screen):
                 'y-center': -15,
                 'color': Screen.COLOUR_YELLOW
             })
-        screen.clear()
         
-        screen.refresh()
+        # Obtener eventos
         event = screen.get_event()
         # Guardar el último MouseEvent válido
         if isinstance(event, MouseEvent):
@@ -61,6 +59,7 @@ def knucklebones(screen):
         event_mouse = last_mouse_event
         contador += 1
         
+        # Configuración de la primera carta (jugador 1)
         print_card_data_1 = copy.deepcopy(print_card_data)
         print_card_data_1['x-center'] = -40
         print_card_data_1['y-center'] = 0
@@ -69,36 +68,41 @@ def knucklebones(screen):
             '1': {'event': event_mouse, 'click': lambda: '1'},
             '2': {'event': event_mouse, 'click': lambda: '2'},
         }
-        print_card_data_1['content']= {
+        print_card_data_1['content'] = {
             str(i): {
-                    'text': get_dado((i % 3) + 1),
-                    'padding-top': 1,
-                    'padding-left': 2,
-                    'color': color1[i],
-                } for i in range(9)
+                'text': get_dado((i % 3) + 1),
+                'padding-top': 1,
+                'padding-left': 2,
+                'color': color1[i],
+            } for i in range(9)
         }
-        print_card_data_2 =  copy.deepcopy(print_card_data)
+        
+        # Configuración de la segunda carta (jugador 2)
+        print_card_data_2 = copy.deepcopy(print_card_data)
         print_card_data_2['x-center'] = 40
         print_card_data_2['y-center'] = 0
         print_card_data_2['click'] = {
             '0': {'event': event_mouse, 'click': lambda: '0'},
             '1': {'event': event_mouse, 'click': lambda: '1'},
-            '2': {'event': event_mouse,  'click': lambda: '2'},
+            '2': {'event': event_mouse, 'click': lambda: '2'},
         }
-        print_card_data_2['content']= {
+        print_card_data_2['content'] = {
             str(i): {
-                    'text': get_dado((i % 3) + 1),
-                    'padding-top': 1,
-                    'padding-left': 2,
-                    'color': color2[i],
-                } for i in range(9)
+                'text': get_dado((i % 3) + 1),
+                'padding-top': 1,
+                'padding-left': 2,
+                'color': color2[i],
+            } for i in range(9)
         }
+        
+        # Dibujar las cartas
         card_1 = print_card(screen, print_card_data_1, event_mouse)
         card_2 = print_card(screen, print_card_data_2, event_mouse)
         card_1_result = card_1['result']
         card_2_result = card_2['result']
-        print(f"Resultado de clicks: {card_1_result}" )
-        # Cuando proceses los clicks:
+        print(f"Resultado de clicks: {card_1_result}")
+        
+        # Procesar clicks de la primera carta
         for idx, result in enumerate(card_1_result):
             if result is not None:
                 print(f"Click en fila/columna: {idx}")
@@ -106,12 +110,18 @@ def knucklebones(screen):
                 color1[idx + 3] = Screen.COLOUR_GREEN if color1[idx + 3] == Screen.COLOUR_DEFAULT else Screen.COLOUR_DEFAULT
                 color1[idx + 6] = Screen.COLOUR_GREEN if color1[idx + 6] == Screen.COLOUR_DEFAULT else Screen.COLOUR_DEFAULT
                 
+        # Procesar clicks de la segunda carta
         for idx, result in enumerate(card_2_result):
             if result is not None:
                 print(f"Click en fila/columna: {idx}")
                 color2[idx] = Screen.COLOUR_GREEN if color2[idx] == Screen.COLOUR_DEFAULT else Screen.COLOUR_DEFAULT
                 color2[idx + 3] = Screen.COLOUR_GREEN if color2[idx + 3] == Screen.COLOUR_DEFAULT else Screen.COLOUR_DEFAULT
                 color2[idx + 6] = Screen.COLOUR_GREEN if color2[idx + 6] == Screen.COLOUR_DEFAULT else Screen.COLOUR_DEFAULT
+        
+        # Verificar si el usuario quiere salir
         salir = add_key_listener(ord('f'), event, lambda: 'salir')
         if salir == 'salir':
             return 'salir'
+        
+        # Actualizar la pantalla después de dibujar todo el contenido
+        screen.refresh()

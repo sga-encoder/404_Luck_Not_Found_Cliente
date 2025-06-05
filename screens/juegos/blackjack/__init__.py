@@ -7,12 +7,13 @@ Contiene todas las pantallas y utilidades relacionadas con el juego de Blackjack
 from .blackjack_inicio import blackjack_inicio
 from .blackjack_juego import blackjack_juego
 from .cartas import mostrar_cartas_en_linea, sacar_carta, cartas, mazo
+from . import blackjack_shared
 
 __all__ = [
     'blackjack_inicio',
     'blackjack_juego', 
-    'mostrar_cartas_en_linea',
-    'sacar_carta',
+    'mostrar_cartas_en_linea',    'sacar_carta',
     'cartas',
-    'mazo'
+    'mazo',
+    'blackjack_shared'
 ]

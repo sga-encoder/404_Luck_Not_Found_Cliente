@@ -8,7 +8,7 @@ from .screens.home import home
 from .screens.juegos.poker import poker
 from .screens.juegos.blackjack.blackjack_inicio import blackjack_inicio
 from .screens.juegos.blackjack.blackjack_juego import blackjack_juego
-from .screens.juegos.knucklebones.knucklebones import knucklebones
+from .screens.juegos.knucklebones.knucklebones_juego import knucklebones
 # from .screens.forms.login import login_form
 # from .screens.forms.login_avanzado import advanced_login_form
 from .utils.events import add_key_listener
@@ -56,7 +56,7 @@ def main(screen):
         if card == 'poker':
             poker(screen)
         elif card == 'blackjack':
-            blackjack(screen)
+            blackjack_inicio(screen)
         elif card == 'knucklebones':
             knucklebones(screen)
 

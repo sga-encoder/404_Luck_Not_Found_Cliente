@@ -1,9 +1,11 @@
 # Módulo Knucklebones del Casino Virtual
 
 from .dados import *
-from .knucklebones import *
+from .knucklebones_juego import *
+from .knucklebones_inicio import *
 
 __all__ = [
     'dados',
-    'knucklebones'
+    'knucklebones_juego',
+    'knucklebones_inicio',
 ]
