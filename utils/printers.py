@@ -457,14 +457,15 @@ def print_card(screen, data: dict, event=None, click=None) -> dict:
             y = card['y_position'] + len(grid_ascii_x)
             
             # Calcular el ancho y alto de la columna
-            width = data_position['grid_cell_width'] - len(grid_ascii_x)
-            height = card['height'] - (len(grid_ascii_x) * 2)- len(grid_ascii_y)
+            width_column = data_position['grid_cell_width'] - len(grid_ascii_x)
+            height_column = card['height'] - (len(grid_ascii_x) * 2)- len(grid_ascii_y)
             
             row = {
                 'x_position': x,
                 'y_position': y,
-                'width': width,
-                'height': height            }
+                'width': width_column,
+                'height': height_column
+            }
             if 'click' in data and str(i) in data['click']:
                 click_column = data['click'][str(i)]
                 aux = add_mouse_listener(
@@ -486,14 +487,15 @@ def print_card(screen, data: dict, event=None, click=None) -> dict:
             y = card['y_position'] + (data_position['grid_cell_height'] * i) + i + len(grid_ascii_y)
 
             # Calcular el ancho y alto de la fila
-            width = card['width'] - (len(grid_ascii_y) * 2) - 1
-            height = data_position['grid_cell_height'] - len(grid_ascii_x)
+            width_row = card['width'] - (len(grid_ascii_y) * 2) - 1
+            height_row = data_position['grid_cell_height'] - len(grid_ascii_x)
 
             row = {
                 'x_position': x,
                 'y_position': y,
-                'width': width,
-                'height': height            }
+                'width': width_row,
+                'height': height_row
+            }
             
             if 'click' in data and str(i) in data['click']:
                 click_row = data['click'][str(i)]

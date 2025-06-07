@@ -15,7 +15,7 @@ async def knucklebones_inicio(screen):
         'y-center': -5,
         'font': 'big_money-ne',
         'justify': 'center',
-        'max-width': 120,
+        'max-width': 140,
     }
     boton_text = {
         'text': '[  INICIAR JUEGO  ]',
@@ -83,19 +83,19 @@ async def knucklebones_inicio(screen):
                 # Verificar que el juego se haya inicializado correctamente
                 if juego is None:
                     print("Error: No se pudo inicializar el juego KnuckleBones")
-                    return False
-                
+                    return (False, None, None, None)
+
                 # Intentar entrar a la sala de juego (usando await porque es async)
-                resultado = await juego.entrar_sala_de_juego(user, juego.to_dict())
+                resultado, id  = await juego.entrar_sala_de_juego(user, juego.to_dict())
                 if resultado:
-                    return button_inicio['result']
+                    return (True, id, user, juego)
                 else:
                     print("Error: No se pudo entrar a la sala de juego")
-                    return False
+                    return (False, None, None, None)
             except Exception as e:
                 print(f"Error al inicializar KnuckleBones: {str(e)}")
-                return False
-        
+                return (False, None, None, None)
+
         # add_key_listener(screen, button_inicio)
         
         if button_inicio['result']:

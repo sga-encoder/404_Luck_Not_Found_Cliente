@@ -15,7 +15,7 @@ from ...utils.user_session import UserSessionManager
 from servidor.src.model.usuario import UsuarioServicio
 
 
-def login_form(screen):
+async def login_form(screen):
     """
     Formulario de login usando print_form.
     """
@@ -194,8 +194,7 @@ def login_form(screen):
         })
         
         screen.refresh()
-        
-        # Verificar si el formulario fue completado
+          # Verificar si el formulario fue completado
         if form_result['form_state']['result']:
             action = form_result['form_state']['result']['action']
             
@@ -203,7 +202,7 @@ def login_form(screen):
                 return form_result['form_state']['result']['data']
             elif action == 'submit':
                 # Ejecutar lógica de login (async)
-                if asyncio.run(handle_login_submit(form_result['form_state'], form_config)):
+                if await handle_login_submit(form_result['form_state'], form_config):
                     if auth_state['result']:
                         return auth_state['result']
             elif action == 'cancel':

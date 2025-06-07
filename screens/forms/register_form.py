@@ -25,7 +25,7 @@ def validate_name(name):
     """Valida que el nombre tenga entre 3 y 30 caracteres"""
     return name and len(name.strip()) >= 3 and len(name.strip()) <= 30
 
-def register_form(screen):
+async def register_form(screen):
     """
     Formulario de registro de usuario usando print_form.
     """
@@ -290,8 +290,7 @@ def register_form(screen):
             'color': Screen.COLOUR_CYAN
         })
         screen.refresh()
-        
-        # Verificar si el formulario fue completado
+          # Verificar si el formulario fue completado
         if form_result['form_state']['result']:
             action = form_result['form_state']['result']['action']
             
@@ -299,7 +298,7 @@ def register_form(screen):
                 return form_result['form_state']['result']['data']
             elif action == 'submit':
                 # Ejecutar lógica de registro (async)
-                if asyncio.run(handle_register_submit(form_result['form_state'], form_config)):
+                if await handle_register_submit(form_result['form_state'], form_config):
                     if auth_state['result']:
                         return auth_state['result']
             elif action == 'cancel':
